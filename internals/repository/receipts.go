@@ -240,10 +240,14 @@ func GetByNameOrLink(receipt *model.Receipt) (res model.ReceiptList) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	fmt.Println("Resposne ")
+	fmt.Println(response)
 	if err = response.All(ctx, &responseReceiptList.Receipts); err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("responseReceiptList.Receipts ")
+	fmt.Println(responseReceiptList.Receipts)
 
 	return responseReceiptList
 }

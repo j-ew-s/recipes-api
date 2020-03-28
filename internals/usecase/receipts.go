@@ -23,11 +23,11 @@ func Create(receipt *model.Receipt) model.ReceiptCreate {
 		return *receiptCreate
 	}
 
-	haveDuplicated := validateDuplicated(receipt)
+	haveDuplicated := isDuplicated(receipt)
 
-	if haveDuplicated.Receipts != nil {
+	if haveDuplicated == true {
 		receiptCreate := new(model.ReceiptCreate)
-		receiptCreate.SetError(nil, haveDuplicated.Message, haveDuplicated.GetStatus())
+		receiptCreate.SetError(nil, "There are already one item with same Name and Link.", 409)
 		return *receiptCreate
 	}
 
@@ -84,9 +84,11 @@ func Update(receipt *model.Receipt, id string) (status int, err error) {
 		return 404, nil
 	}
 
-	receiptDuplicated := validateDuplicated(receipt)
+	receiptDuplicated := repository.GetByNameOrLink(receipt)
 
-	if receiptDuplicated.Quantity > 0 {
+	receiptsFoundLen := len(receiptDuplicated.Receipts)
+
+	if receiptsFoundLen > 0 {
 
 		var duplicatedID = receiptDuplicated.Receipts[0].ID.Hex()
 		if duplicatedID != a {
@@ -108,17 +110,12 @@ func Search(title string) (*model.Receipt, error) {
 	return nil, nil
 }
 
-//validateDuplicated checks for alredy existing objects with Name and Link duplicated.
-func validateDuplicated(receipt *model.Receipt) model.ReceiptList {
+//isDuplicated checks for alredy existing objects with Name and Link duplicated.
+func isDuplicated(receipt *model.Receipt) bool {
 
 	existingReceipts := repository.GetByNameOrLink(receipt)
 
-	if len(existingReceipts.Receipts) > 0 {
-		receiptList := new(model.ReceiptList)
-		receiptList.Message = "There are already an Receipt with this Name or Link"
-		receiptList.SetStatus(409)
-		return *receiptList
-	}
+	var receiptsFound = len(existingReceipts.Receipts)
 
-	return existingReceipts
+	return receiptsFound > 0
 }
