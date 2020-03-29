@@ -1,0 +1,5 @@
+{
+    "apiServer" : "localhost",
+    "apiPort" : "8063",
+    "maxRequestBodySize" : "2147483548"
+}

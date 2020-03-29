@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/j-ew-s/receipts-api/configs"
+
 	"time"
 
 	"github.com/j-ew-s/receipts-api/internals/model"
@@ -32,7 +34,7 @@ func NewReceiptRepository() (*ReceiptRepository, error) {
 
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(configs.MongoDBConfig.MongoServer))
 
 	return &ReceiptRepository{client}, err
 }
@@ -240,14 +242,10 @@ func GetByNameOrLink(receipt *model.Receipt) (res model.ReceiptList) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Resposne ")
-	fmt.Println(response)
+
 	if err = response.All(ctx, &responseReceiptList.Receipts); err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println("responseReceiptList.Receipts ")
-	fmt.Println(responseReceiptList.Receipts)
 
 	return responseReceiptList
 }

@@ -3,6 +3,7 @@ package httpserverhandler
 import (
 	"github.com/buaazp/fasthttprouter"
 	receiptscontroller "github.com/j-ew-s/receipts-api/api"
+	"github.com/j-ew-s/receipts-api/configs"
 	"github.com/valyala/fasthttp"
 )
 
@@ -15,7 +16,8 @@ func CreateHTTPServer() *fasthttp.Server {
 	setRoutes(router)
 
 	http := &fasthttp.Server{
-		Handler: router.Handler,
+		Handler:            router.Handler,
+		MaxRequestBodySize: configs.ServerConfig.MaxRequestBodySize,
 	}
 
 	return http

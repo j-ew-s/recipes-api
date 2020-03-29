@@ -1,14 +1,26 @@
 package main
 
 import (
+	"os"
+
+	"github.com/j-ew-s/receipts-api/configs"
 	httpserverhandler "github.com/j-ew-s/receipts-api/handlers/httpServer"
 )
 
 func main() {
+
+	var envArg = setEnv()
+
+	configs.Create(envArg)
+
 	var httpServer = httpserverhandler.CreateHTTPServer()
 
-	/*
-		TODO : the port should be replaced by configuration parameter
-	*/
-	httpServer.ListenAndServe(":9098")
+	httpServer.ListenAndServe(configs.ServerConfig.APIPort)
+}
+
+func setEnv() string {
+	if len(os.Args) == 2 {
+		return os.Args[1]
+	}
+	return "dev"
 }
