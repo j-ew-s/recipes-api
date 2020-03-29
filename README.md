@@ -32,12 +32,12 @@ go build
 
 ##### run without argument will assume dev envirnment
 ``
-go run 
+go run main.go
 ``
 
 ##### run with one of those arguments on list
 ``
-go run [dev, qa, prod]
+go run  main.go [dev, qa, prod]
 ``
 
 You can check the environment configurations on fodler
