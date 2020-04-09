@@ -26,6 +26,7 @@ func CreateHTTPServer() *fasthttp.Server {
 // Configure all routes for controllers
 func setRoutes(router *fasthttprouter.Router) {
 
+	router.GET("/ping/", receiptscontroller.Ping)
 	router.POST("/receipts/", receiptscontroller.Create)
 	router.GET("/receipts/", receiptscontroller.Get)
 	router.GET("/receipts/tags/", receiptscontroller.GetByTags)

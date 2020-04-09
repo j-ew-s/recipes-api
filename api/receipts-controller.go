@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/j-ew-s/receipts-api/configs"
+
 	receiptinterface "github.com/j-ew-s/receipts-api/internals/interface"
 	"github.com/j-ew-s/receipts-api/internals/usecase"
 
@@ -21,6 +23,31 @@ var (
 //ReceiptsController for
 type ReceiptsController struct {
 	receiptUseCase receiptinterface.UseCase
+}
+
+// Pong export
+type Pong struct {
+	Time            time.Time `json:"time,omitempty"`
+	MongoConnection string    `json:"mongoConnection,omitempty"`
+	MongoUser       string    `json:"mongoUser,omitempty"`
+	ServerPort      string    `json:"serverPort,omitempty"`
+	ServerAPI       string    `json:"serverAPI,omitempty"`
+}
+
+// Ping export
+func Ping(ctx *fasthttp.RequestCtx) {
+
+	response := new(Pong)
+
+	response.Time = time.Now()
+	response.MongoConnection = configs.MongoDBConfig.MongoServer
+	response.MongoUser = configs.MongoDBConfig.User
+	response.ServerPort = configs.ServerConfig.APIPort
+	response.ServerAPI = configs.ServerConfig.APIServer
+
+	if err := json.NewEncoder(ctx).Encode(response); err != nil {
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+	}
 }
 
 // Create insert a new Receipt.
