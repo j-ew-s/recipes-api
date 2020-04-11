@@ -19,8 +19,7 @@ func main() {
 }
 
 func setEnv() string {
-	if len(os.Args) == 2 {
-		return os.Args[1]
-	}
-	return "dev"
+	var env = os.Getenv("ENV")
+
+	return env
 }
