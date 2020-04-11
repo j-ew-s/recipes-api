@@ -45,6 +45,20 @@ configs/files/mongodb and configs/files/server  by its indication on config.mong
 * config.mongodb.dev.json
 * config.server.dev.json
 
+
+### Running with docker
+
+``
+docker build -t receipts-api .
+``
+
+then 
+
+``
+docker run -d --name dev-receipts-api -p 8087:8061 receipts-api
+``
+
+
 ### Architecture
 
 This project is organized in 3 layers.
