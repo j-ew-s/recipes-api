@@ -46,7 +46,7 @@ configs/files/mongodb and configs/files/server  by its indication on config.mong
 * config.server.dev.json
 
 
-### Running with docker
+### Running Dockerfile
 
 ``
 docker build -t receipts-api .

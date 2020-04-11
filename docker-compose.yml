@@ -1,0 +1,10 @@
+mongo:
+  image : mongo
+  ports:
+    - 27020:27017
+api:
+  image : receipts-api
+  ports:
+    - 8087:8061
+  links:
+    - mongo
