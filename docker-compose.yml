@@ -1,10 +1,19 @@
-mongo:
+mongodb:
   image : mongo
   ports:
     - 27020:27017
+  volumes: 
+    - mongodata:/data/db
+
 api:
   image : receipts-api
   ports:
     - 8087:8061
+  environment: 
+    - MONGO_URL=mongodb://172.17.0.2:27017/?readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=false
+    - ENV=dev
   links:
-    - mongo
+    - mongodb
+
+
+

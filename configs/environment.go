@@ -66,7 +66,7 @@ func readMongoDBConfigFile(env string) {
 
 	mongoBDMapped := genericReadFile(mongoFile)
 
-	MongoDBConfig.MongoServer = mongoBDMapped["server"]
+	MongoDBConfig.MongoServer = os.Getenv("MONGO_URL") //mongoBDMapped["server"]
 	MongoDBConfig.Pass = mongoBDMapped["pass"]
 	MongoDBConfig.User = mongoBDMapped["user"]
 

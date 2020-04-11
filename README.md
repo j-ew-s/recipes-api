@@ -15,7 +15,12 @@ The purpouse is to keep Golang codding skills and improve and/or test some conce
 * [Mongo Go Driver](https://github.com/mongodb/mongo-go-driver)
 * [FastHttp](https://github.com/valyala/fasthttp)
 
-### Running
+### Running this project
+
+You can run Receipts-api using 3 differents way. 
+The following steps will guide you through the 3 ways to run it :)
+
+### 1- Running
 
 You can run this api project navigating to cmd folder and running build and run. When executing run command you can pass a third argument as dev, qa or prod indicating the environment you want to execute. When no arg is passing it will assume dev.
 
@@ -46,17 +51,62 @@ configs/files/mongodb and configs/files/server  by its indication on config.mong
 * config.server.dev.json
 
 
-### Running Dockerfile
+### 2 - Running Docker manually
+
+The second way to run this app is by running manually all the steps using docker files to get it up and runnign.
+
+First, you should Create a docker image from this project by running
 
 ``
 docker build -t receipts-api .
 ``
 
-then 
+then pull mongodb
 
 ``
-docker run -d --name dev-receipts-api -p 8087:8061 receipts-api
+docker pull mongo:latest
 ``
+
+Now we should have a volume
+
+``
+docker volume create --name=mongodata
+``
+
+
+Run MongoDb on detached mode using the volume with the name mongodb
+
+``
+docker run --name mongodb -v mongodata:/data/db  -p 27017:27017-d mongo
+``
+
+
+Once we get it up lets run the app  using name as dev-receipts-api passing the mongodb connection as parameter using port 8087 and run it on detached mode.
+
+``
+docker run -d --name dev-receipts-api -e MONGO_URL=mongodb://172.17.0.2:27017/?readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=false -p 8087:8061 receipts-api
+
+``
+### 3 - Running PowerShell script
+
+This is my fav :) 
+
+the run-dev.ps1 file on root folder contains all the steps needed to put receipts-api up and running. 
+
+So, you cann run it by simply  executing:
+
+
+``
+.\run-dev.ps1
+``
+
+
+
+Now you know all the ways to put it running, just try :)
+
+Check the API status  calling the api :
+
+localhost:<port>/ping
 
 
 ### Architecture
