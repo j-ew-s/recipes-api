@@ -1,16 +1,16 @@
-package receiptscontroller
+package recipescontroller
 
 import (
 	"encoding/json"
 	"fmt"
 	"time"
 
-	"github.com/j-ew-s/receipts-api/configs"
+	"github.com/j-ew-s/recipes-api/configs"
 
-	receiptinterface "github.com/j-ew-s/receipts-api/internals/interface"
-	"github.com/j-ew-s/receipts-api/internals/usecase"
+	receiptinterface "github.com/j-ew-s/recipes-api/internals/interface"
+	"github.com/j-ew-s/recipes-api/internals/usecase"
 
-	"github.com/j-ew-s/receipts-api/internals/model"
+	"github.com/j-ew-s/recipes-api/internals/model"
 
 	"github.com/valyala/fasthttp"
 )
@@ -20,8 +20,8 @@ var (
 	strApplicationJSON = []byte("application/json")
 )
 
-//ReceiptsController for
-type ReceiptsController struct {
+//recipesController for
+type recipesController struct {
 	receiptUseCase receiptinterface.UseCase
 }
 
@@ -117,23 +117,23 @@ func Delete(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// Get returns all the receipts
+// Get returns all the recipes
 // No filtering is made
 func Get(ctx *fasthttp.RequestCtx) {
 
-	receipts := usecase.Get()
-	if receipts.Err != nil {
-		ctx.Error(receipts.Err.Error(), fasthttp.StatusInternalServerError)
+	recipes := usecase.Get()
+	if recipes.Err != nil {
+		ctx.Error(recipes.Err.Error(), fasthttp.StatusInternalServerError)
 	}
 
 	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
-	ctx.Response.SetStatusCode(receipts.GetStatus())
+	ctx.Response.SetStatusCode(recipes.GetStatus())
 
 	start := time.Now()
-	if err := json.NewEncoder(ctx).Encode(receipts); err != nil {
+	if err := json.NewEncoder(ctx).Encode(recipes); err != nil {
 		elapsed := time.Since(start)
-		fmt.Println(" ERROR : ", elapsed, err.Error(), receipts.Err)
-		fmt.Println(" Message : ", receipts.Message)
+		fmt.Println(" ERROR : ", elapsed, err.Error(), recipes.Err)
+		fmt.Println(" Message : ", recipes.Message)
 		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 	}
 }
@@ -180,19 +180,19 @@ func GetByTags(ctx *fasthttp.RequestCtx) {
 		tags = append(tags, string(tagsQueryByte[i]))
 	}
 
-	receipts := usecase.GetByTags(tags)
-	if receipts.Err != nil {
-		ctx.Error(receipts.Err.Error(), fasthttp.StatusInternalServerError)
+	recipes := usecase.GetByTags(tags)
+	if recipes.Err != nil {
+		ctx.Error(recipes.Err.Error(), fasthttp.StatusInternalServerError)
 	}
 
 	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
-	ctx.Response.SetStatusCode(receipts.GetStatus())
+	ctx.Response.SetStatusCode(recipes.GetStatus())
 
 	start := time.Now()
-	if err := json.NewEncoder(ctx).Encode(receipts); err != nil {
+	if err := json.NewEncoder(ctx).Encode(recipes); err != nil {
 		elapsed := time.Since(start)
-		fmt.Println(" ERROR : ", elapsed, err.Error(), receipts.Err)
-		fmt.Println(" Message : ", receipts.Message)
+		fmt.Println(" ERROR : ", elapsed, err.Error(), recipes.Err)
+		fmt.Println(" Message : ", recipes.Message)
 		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 	}
 
@@ -229,7 +229,7 @@ func Put(ctx *fasthttp.RequestCtx) {
 
 }
 
-// Search performs search for receipts
+// Search performs search for recipes
 // that contains the search term.
 // Search is made upon all the filds
 func Search(ctx *fasthttp.RequestCtx) {
