@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/j-ew-s/receipts-api/configs"
-	httpserverhandler "github.com/j-ew-s/receipts-api/handlers/httpServer"
+	"github.com/j-ew-s/recipes-api/configs"
+	httpserverhandler "github.com/j-ew-s/recipes-api/handlers/httpServer"
 )
 
 func main() {
