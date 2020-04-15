@@ -1,10 +1,10 @@
 package receiptinterface
 
 import (
-	"github.com/j-ew-s/receipts-api/internals/model"
+	"github.com/j-ew-s/recipes-api/internals/model"
 )
 
-// UseCase represent the Receipt's UseCase contract
+// UseCase represent the Recipe's UseCase contract
 type UseCase interface {
 	Create(receipt *model.Receipt) (int64, error)
 	Delete(id int64) error

@@ -1,10 +1,10 @@
 package receiptinterface
 
 import (
-	"github.com/j-ew-s/receipts-api/internals/model"
+	"github.com/j-ew-s/recipes-api/internals/model"
 )
 
-// Repository represent the Receipt's repository contract
+// Repository represent the Recipe's repository contract
 type Repository interface {
 	Create(receipt *model.Receipt) (int64, error)
 	Delete(id int64) error
