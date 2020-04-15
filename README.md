@@ -1,11 +1,11 @@
-# receipts-api
+# recipes-api
 Study project using Golang + fasthttp + MongoDB driver.
 
 ****
 
 ### Project
 
-receipts-api is an rest api to store receipt links along with some notes. 
+recipes-api is an rest api to store receipt links along with some notes. 
 
 The purpouse is to keep Golang codding skills and improve and/or test some concepts.
 
@@ -17,7 +17,7 @@ The purpouse is to keep Golang codding skills and improve and/or test some conce
 
 ### Running this project
 
-You can run Receipts-api using 3 differents way. 
+You can run recipes-api using 3 differents way. 
 The following steps will guide you through the 3 ways to run it :)
 
 ### 1- Running
@@ -58,7 +58,7 @@ The second way to run this app is by running manually all the steps using docker
 First, you should Create a docker image from this project by running
 
 ``
-docker build -t receipts-api .
+docker build -t recipes-api .
 ``
 
 then pull mongodb
@@ -81,17 +81,17 @@ docker run --name mongodb -v mongodata:/data/db  -p 27017:27017-d mongo
 ``
 
 
-Once we get it up lets run the app  using name as dev-receipts-api passing the mongodb connection as parameter using port 8087 and run it on detached mode.
+Once we get it up lets run the app  using name as dev-recipes-api passing the mongodb connection as parameter using port 8087 and run it on detached mode.
 
 ``
-docker run -d --name dev-receipts-api -e MONGO_URL=mongodb://172.17.0.2:27017/?readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=false -p 8087:8061 receipts-api
+docker run -d --name dev-recipes-api -e MONGO_URL=mongodb://172.17.0.2:27017/?readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=false -p 8087:8061 recipes-api
 
 ``
 ### 3 - Running PowerShell script
 
 This is my fav :) 
 
-the run-dev.ps1 file on root folder contains all the steps needed to put receipts-api up and running. 
+the run-dev.ps1 file on root folder contains all the steps needed to put recipes-api up and running. 
 
 So, you cann run it by simply  executing:
 
