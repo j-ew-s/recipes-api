@@ -141,7 +141,6 @@ Execute commands on MongoDB
 
 ### Future developments 
 
-* Adding docker 
 * Adding GRPC
     * For a log project
 
