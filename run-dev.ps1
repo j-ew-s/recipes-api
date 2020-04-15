@@ -5,9 +5,9 @@ Write-Output "**************************************************"
 
 Write-Output "Step 1"
 Write-Output "Creating image of Receipts-API"
-Write-Output "docker build -t receipts-api ."
+Write-Output "docker build -t recipes-api ."
 
-docker build -t receipts-api .
+docker build -t recipes-api .
 
 
 Write-Output "Step 2"

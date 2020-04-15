@@ -2,8 +2,8 @@ package model
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
-// Receipt is a sctruct to describe an receipt object
-type Receipt struct {
+// Recipe is a sctruct to describe an recipe object
+type Recipe struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty"`
 	Name        string             `bson:"name,omitempty"`
 	Description string             `bson:"description,omitempty"`
@@ -12,14 +12,14 @@ type Receipt struct {
 	Tags        []string           `bson:"tags,omitempty"`
 }
 
-func createInstance() *Receipt {
-	receipt := new(Receipt)
-	return receipt
+func createInstance() *Recipe {
+	recipe := new(Recipe)
+	return recipe
 }
 
 //IsValidToCreate is used to validate the obligatory fields Name and Link.
 // When one of them is not valid (null or empty) will return false and otherwise true
-func (r *Receipt) IsValidToCreate() bool {
+func (r *Recipe) IsValidToCreate() bool {
 
 	if len(r.Name) <= 0 {
 		return false

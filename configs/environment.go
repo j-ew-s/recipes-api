@@ -2,6 +2,7 @@ package configs
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -66,7 +67,18 @@ func readMongoDBConfigFile(env string) {
 
 	mongoBDMapped := genericReadFile(mongoFile)
 
-	MongoDBConfig.MongoServer = os.Getenv("MONGO_URL") //mongoBDMapped["server"]
+	var mongourl = os.Getenv("MONGO_URL")
+
+	fmt.Println("os.Getenv MONGO_URL")
+	fmt.Println(os.Getenv("MONGO_URL"))
+
+	mongoserver := mongoBDMapped["server"]
+
+	if len(mongourl) > 0 {
+		mongoserver = mongourl
+	}
+
+	MongoDBConfig.MongoServer = mongoserver //mongoBDMapped["server"]
 	MongoDBConfig.Pass = mongoBDMapped["pass"]
 	MongoDBConfig.User = mongoBDMapped["user"]
 

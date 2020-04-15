@@ -7,7 +7,6 @@ import (
 
 	"github.com/j-ew-s/recipes-api/configs"
 
-	receiptinterface "github.com/j-ew-s/recipes-api/internals/interface"
 	"github.com/j-ew-s/recipes-api/internals/usecase"
 
 	"github.com/j-ew-s/recipes-api/internals/model"
@@ -19,11 +18,6 @@ var (
 	strContentType     = []byte("Content-Type")
 	strApplicationJSON = []byte("application/json")
 )
-
-//recipesController for
-type recipesController struct {
-	receiptUseCase receiptinterface.UseCase
-}
 
 // Pong export
 type Pong struct {
@@ -50,52 +44,52 @@ func Ping(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// Create insert a new Receipt.
-//  Call Receipt UseCase
-//  Prepare response and return model.ReceiptCreat
+// Create insert a new Recipe.
+//  Call Recipe UseCase
+//  Prepare response and return model.RecipeCreat
 func Create(ctx *fasthttp.RequestCtx) {
 
-	var receipt model.Receipt
+	var recipe model.Recipe
 
-	err := json.Unmarshal(ctx.PostBody(), &receipt)
+	err := json.Unmarshal(ctx.PostBody(), &recipe)
 	if err != nil {
 		panic(err)
 	}
 
-	createdReceipt := usecase.Create(&receipt)
-	if createdReceipt.Err != nil {
-		ctx.Error(createdReceipt.Err.Error(), fasthttp.StatusInternalServerError)
+	createdRecipe := usecase.Create(&recipe)
+	if createdRecipe.Err != nil {
+		ctx.Error(createdRecipe.Err.Error(), fasthttp.StatusInternalServerError)
 	}
 
 	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
-	ctx.Response.SetStatusCode(createdReceipt.GetStatus())
+	ctx.Response.SetStatusCode(createdRecipe.GetStatus())
 
 	start := time.Now()
-	if err := json.NewEncoder(ctx).Encode(createdReceipt); err != nil {
+	if err := json.NewEncoder(ctx).Encode(createdRecipe); err != nil {
 		elapsed := time.Since(start)
-		fmt.Println(" ERROR : ", elapsed, err.Error(), createdReceipt.Err)
-		fmt.Println(" Message : ", createdReceipt.Message)
+		fmt.Println(" ERROR : ", elapsed, err.Error(), createdRecipe.Err)
+		fmt.Println(" Message : ", createdRecipe.Message)
 		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 	}
 
 }
 
-// Delete removes a receipt fisically
+// Delete removes a recipe fisically
 // that match the ID parameter
-// uses Receipt object
+// uses Recipe object
 func Delete(ctx *fasthttp.RequestCtx) {
 
 	id := fmt.Sprintf("%v", ctx.UserValue("id"))
 
-	receipt := usecase.GetByID(id)
+	recipe := usecase.GetByID(id)
 	response := true
 
-	if receipt.Err != nil {
-		ctx.Error(receipt.Err.Error(), receipt.GetStatus())
+	if recipe.Err != nil {
+		ctx.Error(recipe.Err.Error(), recipe.GetStatus())
 		response = false
 	}
 
-	if &receipt != nil {
+	if &recipe != nil {
 		err := usecase.Delete(id)
 
 		if err != nil {
@@ -138,28 +132,28 @@ func Get(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// GetByID will return any receipt with related ID
+// GetByID will return any recipe with related ID
 func GetByID(ctx *fasthttp.RequestCtx) {
 
 	id := fmt.Sprintf("%v", ctx.UserValue("id"))
 
-	receipt := usecase.GetByID(id)
-	if receipt.Err != nil {
-		ctx.Error(receipt.Err.Error(), receipt.GetStatus())
+	recipe := usecase.GetByID(id)
+	if recipe.Err != nil {
+		ctx.Error(recipe.Err.Error(), recipe.GetStatus())
 	}
 
 	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
 
 	var httpStatusCode = 404
 
-	if &receipt != nil {
+	if &recipe != nil {
 		httpStatusCode = 200
 	}
 
 	ctx.Response.SetStatusCode(httpStatusCode)
 
 	start := time.Now()
-	if err := json.NewEncoder(ctx).Encode(receipt); err != nil {
+	if err := json.NewEncoder(ctx).Encode(recipe); err != nil {
 		elapsed := time.Since(start)
 		fmt.Println(" ERROR : ", elapsed, err.Error(), err)
 		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
@@ -167,7 +161,7 @@ func GetByID(ctx *fasthttp.RequestCtx) {
 
 }
 
-// GetByTags performs search for a receipt Tags
+// GetByTags performs search for a recipe Tags
 // that contais the search parameter
 // search is made upon only on Tag property
 func GetByTags(ctx *fasthttp.RequestCtx) {
@@ -198,25 +192,25 @@ func GetByTags(ctx *fasthttp.RequestCtx) {
 
 }
 
-// Put updates a receipt
+// Put updates a recipe
 // that match the ID parameter
-// uses Receipt object
+// uses Recipe object
 func Put(ctx *fasthttp.RequestCtx) {
 
 	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
 
 	var httpStatusCode = 404
 
-	var receipt model.Receipt
+	var recipe model.Recipe
 
 	id := fmt.Sprintf("%v", ctx.UserValue("id"))
-	err := json.Unmarshal(ctx.PostBody(), &receipt)
+	err := json.Unmarshal(ctx.PostBody(), &recipe)
 
 	if err != nil {
 		httpStatusCode = 500
 	}
 
-	httpStatusCode, err = usecase.Update(&receipt, id)
+	httpStatusCode, err = usecase.Update(&recipe, id)
 
 	ctx.Response.SetStatusCode(httpStatusCode)
 

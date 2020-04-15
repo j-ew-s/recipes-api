@@ -6,11 +6,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/j-ew-s/receipts-api/configs"
+	"github.com/j-ew-s/recipes-api/configs"
 
 	"time"
 
-	"github.com/j-ew-s/receipts-api/internals/model"
+	"github.com/j-ew-s/recipes-api/internals/model"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -19,16 +19,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-// ReceiptRepository class
-type ReceiptRepository struct {
+// RecipeRepository class
+type RecipeRepository struct {
 	Client *mongo.Client
 }
 
-// NewReceiptRepository create instance.
+// NewRecipeRepository create instance.
 //  Create an MongoConnect obect using ApplyURI and
 //  a context with 10 seconds of execution.
-//  Returns a new ReceiptRespository with the MongoConect Client
-func NewReceiptRepository() (*ReceiptRepository, error) {
+//  Returns a new RecipeRespository with the MongoConect Client
+func NewRecipeRepository() (*RecipeRepository, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
@@ -36,24 +36,24 @@ func NewReceiptRepository() (*ReceiptRepository, error) {
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(configs.MongoDBConfig.MongoServer))
 
-	return &ReceiptRepository{client}, err
+	return &RecipeRepository{client}, err
 }
 
-//Create an receipt
-// Instanciate MongoDB from receiptDB and receipt table
+//Create an recipe
+// Instanciate MongoDB from recipeDB and recipe table
 // Prerepare the ID as index
-// Inserts a new Receipt
-// Returns model.ReceiptCreate object
-//  When an error rise  ReceiptCreate.Err is set
+// Inserts a new Recipe
+// Returns model.RecipeCreate object
+//  When an error rise  RecipeCreate.Err is set
 //  When no errors ID is set with new _Id bson object
-func Create(receipt *model.Receipt) model.ReceiptCreate {
+func Create(recipe *model.Recipe) model.RecipeCreate {
 
-	receiptCreate := new(model.ReceiptCreate)
+	recipeCreate := new(model.RecipeCreate)
 
-	repository, err := NewReceiptRepository()
+	repository, err := NewRecipeRepository()
 	if err != nil {
-		receiptCreate.SetError(err, "Not able to create  NewReceiptRepository", 500)
-		return *receiptCreate
+		recipeCreate.SetError(err, "Not able to create  NewRecipeRepository", 500)
+		return *recipeCreate
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -62,11 +62,11 @@ func Create(receipt *model.Receipt) model.ReceiptCreate {
 
 	err = repository.Client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		receiptCreate.SetError(err, "DB not responding", 500)
-		return *receiptCreate
+		recipeCreate.SetError(err, "DB not responding", 500)
+		return *recipeCreate
 	}
 
-	collection := repository.Client.Database("receiptDB").Collection("receipt")
+	collection := repository.Client.Database("recipeDB").Collection("recipe")
 
 	index := mongo.IndexModel{
 		Keys: bson.M{
@@ -82,23 +82,23 @@ func Create(receipt *model.Receipt) model.ReceiptCreate {
 	}
 
 	// Insert Datas
-	response, err := collection.InsertOne(ctx, receipt)
+	response, err := collection.InsertOne(ctx, recipe)
 
 	if err != nil {
-		receiptCreate.SetError(err, "Error when Inserting on DB", 500)
-		return *receiptCreate
+		recipeCreate.SetError(err, "Error when Inserting on DB", 500)
+		return *recipeCreate
 	}
 
-	receiptCreate.ID = response.InsertedID
-	receiptCreate.Err = nil
+	recipeCreate.ID = response.InsertedID
+	recipeCreate.Err = nil
 
-	return *receiptCreate
+	return *recipeCreate
 }
 
-//Delete an receipt by its ID
+//Delete an recipe by its ID
 func Delete(id string) error {
 
-	repository, err := NewReceiptRepository()
+	repository, err := NewRecipeRepository()
 	if err != nil {
 		return err
 	}
@@ -112,16 +112,16 @@ func Delete(id string) error {
 		return err
 	}
 
-	collection := repository.Client.Database("receiptDB").Collection("receipt")
+	collection := repository.Client.Database("recipeDB").Collection("recipe")
 
-	receiptID, err := primitive.ObjectIDFromHex(id)
+	recipeID, err := primitive.ObjectIDFromHex(id)
 
 	if err != nil {
 		log.Println("Invalid ObjectID")
 		return err
 	}
 
-	query := bson.M{"_id": bson.M{"$eq": receiptID}}
+	query := bson.M{"_id": bson.M{"$eq": recipeID}}
 
 	_, err = collection.DeleteOne(ctx, query)
 
@@ -132,13 +132,13 @@ func Delete(id string) error {
 	return nil
 }
 
-//Get an receipt
-func Get() (res model.ReceiptList) {
+//Get an recipe
+func Get() (res model.RecipeList) {
 
-	receiptList := model.ReceiptList{}
-	repository, err := NewReceiptRepository()
+	recipeList := model.RecipeList{}
+	repository, err := NewRecipeRepository()
 	if err != nil {
-		return receiptList
+		return recipeList
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -147,34 +147,34 @@ func Get() (res model.ReceiptList) {
 
 	err = repository.Client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		return receiptList
+		return recipeList
 	}
 
-	collection := repository.Client.Database("receiptDB").Collection("receipt")
+	collection := repository.Client.Database("recipeDB").Collection("recipe")
 
 	cursor, err := collection.Find(ctx, bson.M{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err = cursor.All(ctx, &receiptList.Receipts); err != nil {
+	if err = cursor.All(ctx, &recipeList.Recipes); err != nil {
 		log.Fatal(err)
 	}
 
-	receiptList.SetSuccess("", 200)
+	recipeList.SetSuccess("", 200)
 
-	return receiptList
+	return recipeList
 }
 
-//GetByID an receipt
-func GetByID(id string) (res model.ReceiptList) {
+//GetByID an recipe
+func GetByID(id string) (res model.RecipeList) {
 
-	receiptList := model.ReceiptList{}
+	recipeList := model.RecipeList{}
 
-	repository, err := NewReceiptRepository()
+	repository, err := NewRecipeRepository()
 	if err != nil {
-		receiptList.SetError(err, "Could not create NewREceiptRepository on Receipt GetById")
-		return receiptList
+		recipeList.SetError(err, "Could not create NewREceiptRepository on Recipe GetById")
+		return recipeList
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -183,40 +183,40 @@ func GetByID(id string) (res model.ReceiptList) {
 
 	err = repository.Client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		receiptList.SetError(err, "Could not ping repository on Receipt GetById")
-		return receiptList
+		recipeList.SetError(err, "Could not ping repository on Recipe GetById")
+		return recipeList
 	}
 
-	collection := repository.Client.Database("receiptDB").Collection("receipt")
+	collection := repository.Client.Database("recipeDB").Collection("recipe")
 
-	receiptID, err := primitive.ObjectIDFromHex(id)
+	recipeID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		receiptList.SetError(err, "Invalid objectIDFromHex on Receipt GetById")
-		return receiptList
+		recipeList.SetError(err, "Invalid objectIDFromHex on Recipe GetById")
+		return recipeList
 	}
 
-	response := collection.FindOne(ctx, bson.M{"_id": receiptID})
+	response := collection.FindOne(ctx, bson.M{"_id": recipeID})
 
-	re := model.Receipt{}
+	re := model.Recipe{}
 	response.Decode(&re)
 
-	receiptList.Receipts = append(receiptList.Receipts, re)
+	recipeList.Recipes = append(recipeList.Recipes, re)
 
-	receiptList.SetSuccess(
+	recipeList.SetSuccess(
 		"Found",
 		200)
 
-	return receiptList
+	return recipeList
 }
 
 //GetByNameOrLink will get any object with same Name Or Link
-func GetByNameOrLink(receipt *model.Receipt) (res model.ReceiptList) {
+func GetByNameOrLink(recipe *model.Recipe) (res model.RecipeList) {
 
-	responseReceiptList := model.ReceiptList{}
+	responseRecipeList := model.RecipeList{}
 
-	repository, err := NewReceiptRepository()
+	repository, err := NewRecipeRepository()
 	if err != nil {
-		return responseReceiptList
+		return responseRecipeList
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -225,15 +225,15 @@ func GetByNameOrLink(receipt *model.Receipt) (res model.ReceiptList) {
 
 	err = repository.Client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		return responseReceiptList
+		return responseRecipeList
 	}
 
-	collection := repository.Client.Database("receiptDB").Collection("receipt")
+	collection := repository.Client.Database("recipeDB").Collection("recipe")
 
 	query := bson.M{
 		"$or": []bson.M{
-			bson.M{"name": receipt.Name},
-			bson.M{"link": receipt.Link},
+			bson.M{"name": recipe.Name},
+			bson.M{"link": recipe.Link},
 		},
 	}
 
@@ -243,21 +243,21 @@ func GetByNameOrLink(receipt *model.Receipt) (res model.ReceiptList) {
 		log.Fatal(err)
 	}
 
-	if err = response.All(ctx, &responseReceiptList.Receipts); err != nil {
+	if err = response.All(ctx, &responseRecipeList.Recipes); err != nil {
 		log.Fatal(err)
 	}
 
-	return responseReceiptList
+	return responseRecipeList
 }
 
-//GetByTags an receipt
-func GetByTags(tags []string) (res model.ReceiptList) {
+//GetByTags an recipe
+func GetByTags(tags []string) (res model.RecipeList) {
 
-	receiptList := model.ReceiptList{}
+	recipeList := model.RecipeList{}
 
-	repository, err := NewReceiptRepository()
+	repository, err := NewRecipeRepository()
 	if err != nil {
-		return receiptList
+		return recipeList
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -266,10 +266,10 @@ func GetByTags(tags []string) (res model.ReceiptList) {
 
 	err = repository.Client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		return receiptList
+		return recipeList
 	}
 
-	collection := repository.Client.Database("receiptDB").Collection("receipt")
+	collection := repository.Client.Database("recipeDB").Collection("recipe")
 
 	query := bson.M{"tags": bson.M{"$all": tags}}
 
@@ -279,19 +279,19 @@ func GetByTags(tags []string) (res model.ReceiptList) {
 		log.Fatal(err)
 	}
 
-	if err = response.All(ctx, &receiptList.Receipts); err != nil {
+	if err = response.All(ctx, &recipeList.Recipes); err != nil {
 		log.Fatal(err)
 	}
 
-	receiptList.SetSuccess("", 200)
+	recipeList.SetSuccess("", 200)
 
-	return receiptList
+	return recipeList
 }
 
-//Update an receipt
-func Update(receipt *model.Receipt) error {
+//Update an recipe
+func Update(recipe *model.Recipe) error {
 
-	repository, err := NewReceiptRepository()
+	repository, err := NewRecipeRepository()
 	if err != nil {
 		return err
 	}
@@ -305,17 +305,17 @@ func Update(receipt *model.Receipt) error {
 		return err
 	}
 
-	collection := repository.Client.Database("receiptDB").Collection("receipt")
+	collection := repository.Client.Database("recipeDB").Collection("recipe")
 
 	result, err := collection.UpdateOne(
 		ctx,
-		bson.M{"_id": receipt.ID},
+		bson.M{"_id": recipe.ID},
 		bson.D{
-			{"$set", bson.D{primitive.E{Key: "name", Value: receipt.Name}}},
-			{"$set", bson.D{primitive.E{Key: "description", Value: receipt.Description}}},
-			{"$set", bson.D{primitive.E{Key: "link", Value: receipt.Link}}},
-			{"$set", bson.D{primitive.E{Key: "rate", Value: receipt.Rate}}},
-			{"$set", bson.D{primitive.E{Key: "tags", Value: receipt.Tags}}},
+			{"$set", bson.D{primitive.E{Key: "name", Value: recipe.Name}}},
+			{"$set", bson.D{primitive.E{Key: "description", Value: recipe.Description}}},
+			{"$set", bson.D{primitive.E{Key: "link", Value: recipe.Link}}},
+			{"$set", bson.D{primitive.E{Key: "rate", Value: recipe.Rate}}},
+			{"$set", bson.D{primitive.E{Key: "tags", Value: recipe.Tags}}},
 		},
 	)
 	if err != nil {
@@ -330,7 +330,7 @@ func Update(receipt *model.Receipt) error {
 	return nil
 }
 
-//Search an receipt
-func Search(ctx context.Context, title string) (*model.Receipt, error) {
+//Search an recipe
+func Search(ctx context.Context, title string) (*model.Recipe, error) {
 	return nil, nil
 }

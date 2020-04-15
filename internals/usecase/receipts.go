@@ -1,102 +1,102 @@
 package usecase
 
 import (
-	"github.com/j-ew-s/receipts-api/internals/model"
-	"github.com/j-ew-s/receipts-api/internals/repository"
+	"github.com/j-ew-s/recipes-api/internals/model"
+	"github.com/j-ew-s/recipes-api/internals/repository"
 )
 
-//Create a receipt
+//Create a recipe
 //  Validates Required fields:
 //   - Name and link.
 //     - Returns message and http status 400
 //   Validate duplicated Name and link.
 //     - Returns Message and http status 400
-//  Call Receipt Repository
-//  Returns the model ReceiptCreate
-func Create(receipt *model.Receipt) model.ReceiptCreate {
+//  Call Recipe Repository
+//  Returns the model RecipeCreate
+func Create(recipe *model.Recipe) model.RecipeCreate {
 
-	isValidToCreate := receipt.IsValidToCreate()
+	isValidToCreate := recipe.IsValidToCreate()
 
 	if isValidToCreate == false {
-		receiptCreate := new(model.ReceiptCreate)
-		receiptCreate.SetError(nil, "Name and Link are obligatory", 400)
-		return *receiptCreate
+		recipeCreate := new(model.RecipeCreate)
+		recipeCreate.SetError(nil, "Name and Link are obligatory", 400)
+		return *recipeCreate
 	}
 
-	haveDuplicated := isDuplicated(receipt)
+	haveDuplicated := isDuplicated(recipe)
 
 	if haveDuplicated == true {
-		receiptCreate := new(model.ReceiptCreate)
-		receiptCreate.SetError(nil, "There are already one item with same Name and Link.", 409)
-		return *receiptCreate
+		recipeCreate := new(model.RecipeCreate)
+		recipeCreate.SetError(nil, "There are already one item with same Name and Link.", 409)
+		return *recipeCreate
 	}
 
-	receiptCreated := repository.Create(receipt)
+	recipeCreated := repository.Create(recipe)
 
-	return receiptCreated
+	return recipeCreated
 }
 
-// Delete a receipt
+// Delete a recipe
 func Delete(id string) error {
-	receiptsList := repository.Delete(id)
+	recipesList := repository.Delete(id)
 
-	return receiptsList
+	return recipesList
 }
 
-// Get a receipt
-func Get() (res model.ReceiptList) {
+// Get a recipe
+func Get() (res model.RecipeList) {
 
-	receiptsList := repository.Get()
+	recipesList := repository.Get()
 
-	return receiptsList
+	return recipesList
 }
 
-// GetByID a receipt
-func GetByID(id string) (res model.ReceiptList) {
-	receipt := repository.GetByID(id)
-	return receipt
+// GetByID a recipe
+func GetByID(id string) (res model.RecipeList) {
+	recipe := repository.GetByID(id)
+	return recipe
 }
 
-// GetByTags a receipt
-func GetByTags(tags []string) (res model.ReceiptList) {
+// GetByTags a recipe
+func GetByTags(tags []string) (res model.RecipeList) {
 
-	receiptsList := repository.GetByTags(tags)
+	recipesList := repository.GetByTags(tags)
 
-	return receiptsList
+	return recipesList
 }
 
-// Update a receipt
-func Update(receipt *model.Receipt, id string) (status int, err error) {
+// Update a recipe
+func Update(recipe *model.Recipe, id string) (status int, err error) {
 
-	var a = receipt.ID.Hex()
+	var a = recipe.ID.Hex()
 
 	if id != a {
 		return 400, nil
 	}
 
-	receiptFound := GetByID(id)
+	recipeFound := GetByID(id)
 
 	if err != nil {
 		return 500, err
 	}
 
-	if &receiptFound == nil {
+	if &recipeFound == nil {
 		return 404, nil
 	}
 
-	receiptDuplicated := repository.GetByNameOrLink(receipt)
+	recipeDuplicated := repository.GetByNameOrLink(recipe)
 
-	receiptsFoundLen := len(receiptDuplicated.Receipts)
+	recipesFoundLen := len(recipeDuplicated.Recipes)
 
-	if receiptsFoundLen > 0 {
+	if recipesFoundLen > 0 {
 
-		var duplicatedID = receiptDuplicated.Receipts[0].ID.Hex()
+		var duplicatedID = recipeDuplicated.Recipes[0].ID.Hex()
 		if duplicatedID != a {
 			return 409, nil
 		}
 	}
 
-	err = repository.Update(receipt)
+	err = repository.Update(recipe)
 
 	if err != nil {
 		return 500, nil
@@ -105,17 +105,17 @@ func Update(receipt *model.Receipt, id string) (status int, err error) {
 	return 200, nil
 }
 
-// Search a receipt
-func Search(title string) (*model.Receipt, error) {
+// Search a recipe
+func Search(title string) (*model.Recipe, error) {
 	return nil, nil
 }
 
 //isDuplicated checks for alredy existing objects with Name and Link duplicated.
-func isDuplicated(receipt *model.Receipt) bool {
+func isDuplicated(recipe *model.Recipe) bool {
 
-	existingReceipts := repository.GetByNameOrLink(receipt)
+	existingRecipes := repository.GetByNameOrLink(recipe)
 
-	var receiptsFound = len(existingReceipts.Receipts)
+	var recipesFound = len(existingRecipes.Recipes)
 
-	return receiptsFound > 0
+	return recipesFound > 0
 }

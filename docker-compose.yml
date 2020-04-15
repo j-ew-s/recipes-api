@@ -6,7 +6,7 @@ mongodb:
     - mongodata:/data/db
 
 api:
-  image : receipts-api
+  image : recipes-api
   ports:
     - 8087:8061
   environment: 

@@ -1,4 +1,4 @@
-package receiptinterface
+package recipeinterface
 
 import (
 	"github.com/j-ew-s/recipes-api/internals/model"
@@ -6,11 +6,11 @@ import (
 
 // Repository represent the Recipe's repository contract
 type Repository interface {
-	Create(receipt *model.Receipt) (int64, error)
+	Create(recipe *model.Recipe) (int64, error)
 	Delete(id int64) error
-	Get() (res []*model.Receipt)
-	GetByID(id int64) (*model.Receipt, error)
-	GetByTags(tags []string) (*model.Receipt, error)
-	Update(receipt *model.Receipt) error
-	Search(title string) (*model.Receipt, error)
+	Get() (res []*model.Recipe)
+	GetByID(id int64) (*model.Recipe, error)
+	GetByTags(tags []string) (*model.Recipe, error)
+	Update(recipe *model.Recipe) error
+	Search(title string) (*model.Recipe, error)
 }
