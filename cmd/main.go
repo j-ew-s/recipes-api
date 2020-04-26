@@ -13,9 +13,9 @@ func main() {
 
 	configs.Create(envArg)
 
-	var httpServer = httpserverhandler.CreateHTTPServer()
+	httpserverhandler.CreateHTTPServer()
 
-	httpServer.ListenAndServe(configs.ServerConfig.APIPort)
+	//httpServer.ListenAndServe(configs.ServerConfig.APIPort,)
 }
 
 func setEnv() string {

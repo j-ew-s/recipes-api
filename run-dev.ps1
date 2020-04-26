@@ -6,6 +6,8 @@ Write-Output "**************************************************"
 Write-Output "Step 1"
 Write-Output "Creating image of Receipts-API"
 Write-Output "docker build -t recipes-api ."
+## -t ou --tag é para dar NOME ao arquivo.
+##  o . ao final indica que o arquivo Dockerfile está no mesmo diretório que o comando está a ser executado
 
 docker build -t recipes-api .
 
