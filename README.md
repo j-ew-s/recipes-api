@@ -84,6 +84,7 @@ docker run --name mongodb -v mongodata:/data/db  -p 27017:27017-d mongo
 Once we get it up lets run the app  using name as dev-recipes-api passing the mongodb connection as parameter using port 8087 and run it on detached mode.
 
 ``
+
 docker run -d --name dev-recipes-api -e MONGO_URL=mongodb://172.17.0.2:27017/?readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=false -p 8087:8061 recipes-api
 
 ``
