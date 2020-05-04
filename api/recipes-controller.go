@@ -39,9 +39,8 @@ func Ping(ctx *fasthttp.RequestCtx) {
 	response.ServerPort = configs.ServerConfig.APIPort
 	response.ServerAPI = configs.ServerConfig.APIServer
 
-	if err := json.NewEncoder(ctx).Encode(response); err != nil {
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
-	}
+	PrepareResponse(ctx, 200, response)
+
 }
 
 // Create insert a new Recipe.
@@ -61,16 +60,7 @@ func Create(ctx *fasthttp.RequestCtx) {
 		ctx.Error(createdRecipe.Err.Error(), fasthttp.StatusInternalServerError)
 	}
 
-	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
-	ctx.Response.SetStatusCode(createdRecipe.GetStatus())
-
-	start := time.Now()
-	if err := json.NewEncoder(ctx).Encode(createdRecipe); err != nil {
-		elapsed := time.Since(start)
-		fmt.Println(" ERROR : ", elapsed, err.Error(), createdRecipe.Err)
-		fmt.Println(" Message : ", createdRecipe.Message)
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
-	}
+	PrepareResponse(ctx, createdRecipe.GetStatus(), createdRecipe)
 
 }
 
@@ -80,13 +70,14 @@ func Create(ctx *fasthttp.RequestCtx) {
 func Delete(ctx *fasthttp.RequestCtx) {
 
 	id := fmt.Sprintf("%v", ctx.UserValue("id"))
-
+	httpStatus := 200
 	recipe := usecase.GetByID(id)
 	response := true
 
 	if recipe.Err != nil {
 		ctx.Error(recipe.Err.Error(), recipe.GetStatus())
 		response = false
+		httpStatus = 404
 	}
 
 	if &recipe != nil {
@@ -95,20 +86,12 @@ func Delete(ctx *fasthttp.RequestCtx) {
 		if err != nil {
 			ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 			response = false
+			httpStatus = 500
 		}
 
 	}
 
-	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
-
-	ctx.Response.SetStatusCode(200)
-
-	start := time.Now()
-	if err := json.NewEncoder(ctx).Encode(response); err != nil {
-		elapsed := time.Since(start)
-		fmt.Println(" ERROR : ", elapsed, err.Error(), err)
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
-	}
+	PrepareResponse(ctx, httpStatus, response)
 }
 
 // Get returns all the recipes
@@ -120,16 +103,8 @@ func Get(ctx *fasthttp.RequestCtx) {
 		ctx.Error(recipes.Err.Error(), fasthttp.StatusInternalServerError)
 	}
 
-	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
-	ctx.Response.SetStatusCode(recipes.GetStatus())
+	PrepareResponse(ctx, recipes.GetStatus(), recipes)
 
-	start := time.Now()
-	if err := json.NewEncoder(ctx).Encode(recipes); err != nil {
-		elapsed := time.Since(start)
-		fmt.Println(" ERROR : ", elapsed, err.Error(), recipes.Err)
-		fmt.Println(" Message : ", recipes.Message)
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
-	}
 }
 
 // GetByID will return any recipe with related ID
@@ -150,14 +125,7 @@ func GetByID(ctx *fasthttp.RequestCtx) {
 		httpStatusCode = 200
 	}
 
-	ctx.Response.SetStatusCode(httpStatusCode)
-
-	start := time.Now()
-	if err := json.NewEncoder(ctx).Encode(recipe); err != nil {
-		elapsed := time.Since(start)
-		fmt.Println(" ERROR : ", elapsed, err.Error(), err)
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
-	}
+	PrepareResponse(ctx, httpStatusCode, recipe)
 
 }
 
@@ -176,19 +144,10 @@ func GetByTags(ctx *fasthttp.RequestCtx) {
 
 	recipes := usecase.GetByTags(tags)
 	if recipes.Err != nil {
-		ctx.Error(recipes.Err.Error(), fasthttp.StatusInternalServerError)
+		recipes.SetStatus(fasthttp.StatusInternalServerError)
 	}
 
-	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
-	ctx.Response.SetStatusCode(recipes.GetStatus())
-
-	start := time.Now()
-	if err := json.NewEncoder(ctx).Encode(recipes); err != nil {
-		elapsed := time.Since(start)
-		fmt.Println(" ERROR : ", elapsed, err.Error(), recipes.Err)
-		fmt.Println(" Message : ", recipes.Message)
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
-	}
+	PrepareResponse(ctx, recipes.GetStatus(), recipes)
 
 }
 
@@ -199,7 +158,7 @@ func Put(ctx *fasthttp.RequestCtx) {
 
 	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
 
-	var httpStatusCode = 404
+	var httpStatus = 404
 
 	var recipe model.Recipe
 
@@ -207,19 +166,12 @@ func Put(ctx *fasthttp.RequestCtx) {
 	err := json.Unmarshal(ctx.PostBody(), &recipe)
 
 	if err != nil {
-		httpStatusCode = 500
+		httpStatus = 500
 	}
 
-	httpStatusCode, err = usecase.Update(&recipe, id)
+	httpStatus, err = usecase.Update(&recipe, id)
 
-	ctx.Response.SetStatusCode(httpStatusCode)
-
-	start := time.Now()
-	if err := json.NewEncoder(ctx).Encode(true); err != nil {
-		elapsed := time.Since(start)
-		fmt.Println(" ERROR : ", elapsed, err.Error(), err)
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
-	}
+	PrepareResponse(ctx, httpStatus, recipe)
 
 }
 
@@ -229,5 +181,22 @@ func Put(ctx *fasthttp.RequestCtx) {
 func Search(ctx *fasthttp.RequestCtx) {
 
 	fmt.Println("Entrou no Search")
+
+}
+
+// PrepareResponse Prepare responses
+func PrepareResponse(ctx *fasthttp.RequestCtx, code int, response interface{}) {
+
+	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
+
+	ctx.Response.SetStatusCode(code)
+
+	start := time.Now()
+
+	if err := json.NewEncoder(ctx).Encode(response); err != nil {
+		elapsed := time.Since(start)
+		fmt.Println(" ERROR : ", elapsed, err.Error(), response)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+	}
 
 }

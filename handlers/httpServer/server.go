@@ -34,7 +34,7 @@ func setRoutes(router *fasthttprouter.Router) {
 }
 
 var (
-	corsAllowHeaders     = "authorization"
+	corsAllowHeaders     = "*"
 	corsAllowMethods     = "HEAD,GET,POST,PUT,DELETE,OPTIONS"
 	corsAllowOrigin      = "*"
 	corsAllowCredentials = "true"

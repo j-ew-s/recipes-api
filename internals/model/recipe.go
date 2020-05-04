@@ -4,12 +4,12 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 // Recipe is a sctruct to describe an recipe object
 type Recipe struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Name        string             `bson:"name,omitempty"`
-	Description string             `bson:"description,omitempty"`
-	Link        string             `bson:"link,omitempty"`
-	Rate        int                `bson:"rate,omitempty"`
-	Tags        []string           `bson:"tags,omitempty"`
+	ID          primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	Name        string             `json:"name,omitempty" bson:"name,omitempty"`
+	Description string             `json:"description,omitempty" bson:"description,omitempty"`
+	Link        string             `json:"link,omitempty" bson:"link,omitempty"`
+	Rate        int                `json:"rate,omitempty" bson:"rate,omitempty"`
+	Tags        []string           `json:"tags,omitempty" bson:"tags,omitempty"`
 }
 
 func createInstance() *Recipe {
